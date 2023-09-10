@@ -18,7 +18,7 @@ import aubio
 p = pyaudio.PyAudio()
 
 # open stream
-buffer_size = 1024
+buffer_size = 8192
 pyaudio_format = pyaudio.paFloat32
 n_channels = 1
 samplerate = 44100
@@ -50,7 +50,7 @@ pitch_o.set_tolerance(tolerance)
 print("*** starting recording")
 while True:
     try:
-        audiobuffer = stream.read(buffer_size)
+        audiobuffer = stream.read(buffer_size, exception_on_overflow = False)
         signal = np.fromstring(audiobuffer, dtype=np.float32)
 
         pitch = pitch_o(signal)[0]

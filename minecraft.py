@@ -9,19 +9,22 @@
 #    $ ./python/demos/demo_pyaudio.py
 #    $ ./python/demos/demo_pyaudio.py /tmp/recording.wav
 
-import keeb
+import gamingfunctions as keeb
 
 import pyaudio
 import sys
 import numpy as np
 import aubio
+import os
+
+import time
 
 # initialise pyaudio
 p = pyaudio.PyAudio()
 
 
 # open stream
-buffer_size = 1024
+buffer_size = 4096
 pyaudio_format = pyaudio.paFloat32
 n_channels = 1
 samplerate = 44100
@@ -32,11 +35,12 @@ stream = p.open(format=pyaudio_format,
                 frames_per_buffer=buffer_size)
 
 if len(sys.argv) > 1:
-    # record 5 seconds
-    output_filename = sys.argv[1]
-    record_duration = 5 # exit 1
-    outputsink = aubio.sink(sys.argv[1], samplerate)
-    total_frames = 0
+    # # record 5 seconds
+    # output_filename = sys.argv[1]
+    # record_duration = 5 # exit 1
+    # outputsink = aubio.sink(sys.argv[1], samplerate)
+    # total_frames = 0
+    pass
 else:
     # run forever
     outputsink = None
@@ -50,35 +54,49 @@ pitch_o = aubio.pitch("default", win_s, hop_s, samplerate)
 pitch_o.set_unit("midi")
 pitch_o.set_tolerance(tolerance)
 
+def getPitch():
+    audiobuffer = stream.read(buffer_size, exception_on_overflow=False)
+    signal = np.fromstring(audiobuffer, dtype=np.float32)
+    print("{} signal".format(signal))
+    pitch = pitch_o(signal)[0]
+
+    return pitch
+
+
+
+
+
+
+# '------------------------'
+
 print("*** starting recording")
 while True:
-    try:
-        audiobuffer = stream.read(buffer_size, exception_on_overflow=False)
-        signal = np.fromstring(audiobuffer, dtype=np.float32)
-        print("{} signal".format(signal))
-        pitch = pitch_o(signal)[0]
-        confidence = pitch_o.get_confidence()
+    pitch = getPitch()
+    while pitch is None:
+        pitch = getPitch()
 
+    letter = keeb.get_key(int(pitch))
 
-       
-       
-        letter = keeb.get_key(int(pitch))
+    print("{} / {}".format(int(pitch),letter))
 
-        print("{} / {}".format(int(pitch),letter))
+    
 
-        if letter and pitch>0 and pitch>=39 and pitch <=85:
-            keeb.type_key(letter)
+    if letter and pitch>=39 and pitch <=85:
 
-        if outputsink:
-            outputsink(signal, len(signal))
+        
+        keeb.type_key(letter)
+        # stream.stop_stream()
 
-        if record_duration:
-            total_frames += len(signal)
-            if record_duration * samplerate < total_frames:
-                break
-    except KeyboardInterrupt:
-        print("*** Ctrl+C pressed, exiting")
-        break
+        
+
+    if outputsink:
+        outputsink(signal, len(signal))
+
+    if record_duration:
+        total_frames += len(signal)
+        if record_duration * samplerate < total_frames:
+            break
+    
 
 print("*** done recording")
 stream.stop_stream()
