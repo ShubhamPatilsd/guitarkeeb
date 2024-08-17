@@ -13,7 +13,7 @@ def initializeAudio():
     pyaudio_format = pyaudio.paFloat32
     n_channels = 1
     samplerate = 44100
-    stream = PYAUDIOVAR.open(format=pyaudio_format,
+    stream = pyaudio_obj.open(format=pyaudio_format,
                     channels=n_channels,
                     rate=samplerate,
                     input=True,
@@ -29,7 +29,7 @@ def initializeAudio():
     pitch_o.set_unit("midi")
     pitch_o.set_tolerance(tolerance)
 
-    return PYAUDIOVAR
+    return pyaudio_obj
 
 def getPitch():
     audiobuffer = stream.read(buffer_size, exception_on_overflow=False)
