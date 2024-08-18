@@ -54,15 +54,15 @@ def getPitch():
 def convertPitchToCommand(pitch, table):
     return table.get(str(pitch)) or None;
 
-def executeCommand(letter, special_keys, mouse_click, mouse_move):
+def executeCommand(letter):
     letter = str(letter)
-    keyboard = keyboard.Controller()
+    keyboardControl = keyboard.Controller()
     mouseControl = mouse.Controller()
     
     if(letter in specialKeys.keys()):
-        keyboard.press(specialKeys.get(letter))
+        keyboardControl.press(specialKeys.get(letter))
         time.sleep(0.1)
-        keyboard.release(specialKeys.get(letter))
+        keyboardControl.release(specialKeys.get(letter))
         
     elif(letter in mouseClick.keys()):
         mouseControl.press(mouseClick.get(letter))
@@ -82,9 +82,9 @@ def executeCommand(letter, special_keys, mouse_click, mouse_move):
         print("success", success)
 
     else:
-        keyboard.press(letter)
+        keyboardControl.press(letter)
         time.sleep(0.1)
-        keyboard.release(letter)
+        keyboardControl.release(letter)
 
 
 
@@ -94,7 +94,7 @@ while True:
     if not pitch:
         continue
     else:
-        command = convertPitchToCommand(int(pitch))
+        command = convertPitchToCommand(int(pitch), table)
         if command and pitch>=39 and pitch <=85:
             executeCommand(command)
 
