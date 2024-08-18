@@ -6,30 +6,30 @@ import aubio
 import os
 import time
 
-def initializeAudio():
-    # setup audio
-    pyaudio_obj = pyaudio.PyAudio()
-    buffer_size = 4096
-    pyaudio_format = pyaudio.paFloat32
-    n_channels = 1
-    samplerate = 44100
-    stream = pyaudio_obj.open(format=pyaudio_format,
-                    channels=n_channels,
-                    rate=samplerate,
-                    input=True,
-                    frames_per_buffer=buffer_size)
-    outputsink = None
-    record_duration = None
 
-    # setup pitch
-    tolerance = 0.8
-    win_s = 4096 # fft size
-    hop_s = buffer_size # hop size
-    pitch_o = aubio.pitch("default", win_s, hop_s, samplerate)
-    pitch_o.set_unit("midi")
-    pitch_o.set_tolerance(tolerance)
+# setup audio
+pyaudio_obj = pyaudio.PyAudio()
+buffer_size = 4096
+pyaudio_format = pyaudio.paFloat32
+n_channels = 1
+samplerate = 44100
+stream = pyaudio_obj.open(format=pyaudio_format,
+                channels=n_channels,
+                rate=samplerate,
+                input=True,
+                frames_per_buffer=buffer_size)
+outputsink = None
+record_duration = None
 
-    return pyaudio_obj
+# setup pitch
+tolerance = 0.8
+win_s = 4096 # fft size
+hop_s = buffer_size # hop size
+pitch_o = aubio.pitch("default", win_s, hop_s, samplerate)
+pitch_o.set_unit("midi")
+pitch_o.set_tolerance(tolerance)
+
+return pyaudio_obj
 
 def getPitch():
     audiobuffer = stream.read(buffer_size, exception_on_overflow=False)

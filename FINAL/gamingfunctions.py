@@ -17,7 +17,7 @@ def key_pitch_tuning():
 
     with open("minecraft.csv", 'r') as data:
         for line in csv.DictReader(data):
-            
+
             line = dict(line)
             pitchToKey.update({line.get("pitch"):line.get("key")})
 
